@@ -16,6 +16,13 @@ GET https://play-api.faizankhichi.me/?q=<query>
 
 Cada petición devuelve JSON limpio. El único parámetro obligatorio es `q`.
 
+## Sitio de demostración
+
+Prueba la API sin escribir código: **[demo en vivo](https://play-api.faizankhichi.me/demo)** — una página de búsqueda sencilla construida con esta API. Busca apps, filtra gratis/de pago, abre una tarjeta para ver los detalles completos y las capturas, y toca **Join Beta** para abrir la página del programa beta de la app.
+
+La demo es un escaparate: es lo que puedes construir con esta API. Su código está en [example-site/](https://github.com/FAK-LABS/playstore-search-api/tree/main/example-site) — un solo `index.html` estático más un README corto. Cópialo, alójalo donde quieras o ábrelo tal cual; llama a la API en vivo, sin clave.
+
+
 ## Inicio rápido
 
 ```bash

@@ -16,6 +16,13 @@ GET https://play-api.faizankhichi.me/?q=<query>
 
 Setiap permintaan mengembalikan JSON yang bersih. Satu-satunya parameter wajib adalah `q`.
 
+## Situs demo
+
+Coba API tanpa menulis kode: **[demo langsung](https://play-api.faizankhichi.me/demo)** — halaman pencarian sederhana yang dibangun dengan API ini. Cari aplikasi, filter gratis/berbayar, buka kartu untuk detail lengkap dan tangkapan layar, lalu ketuk **Join Beta** untuk membuka halaman program beta aplikasi.
+
+Demo ini adalah etalase: inilah yang bisa Anda bangun dengan API ini. Kodenya ada di [example-site/](https://github.com/FAK-LABS/playstore-search-api/tree/main/example-site) — satu `index.html` statis plus README singkat. Salin, hosting di mana saja, atau buka apa adanya; ia memanggil API langsung, tanpa kunci.
+
+
 ## Mulai cepat
 
 ```bash

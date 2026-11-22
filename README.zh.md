@@ -16,6 +16,13 @@ GET https://play-api.faizankhichi.me/?q=<query>
 
 每次请求都返回干净的 JSON。唯一必填参数是 `q`。
 
+## 演示站点
+
+无需编写代码即可试用 API：**[在线演示](https://play-api.faizankhichi.me/demo)**——一个基于此 API 构建的简单搜索页面。搜索应用、按免费/付费筛选、打开卡片查看完整详情和截图，点击 **Join Beta** 打开该应用的 Beta 计划页面。
+
+这个演示是一个展示：这就是您可以用此 API 构建的东西。代码位于 [example-site/](https://github.com/FAK-LABS/playstore-search-api/tree/main/example-site)——一个静态 `index.html` 文件加一个简短的 README。复制它、托管在任何地方，或直接打开；它直接调用在线 API，无需密钥。
+
+
 ## 快速开始
 
 ```bash

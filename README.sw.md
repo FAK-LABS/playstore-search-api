@@ -16,6 +16,13 @@ GET https://play-api.faizankhichi.me/?q=<query>
 
 Kila ombi linarudisha JSON safi. Kigezo pekee cha lazima ni `q`.
 
+## Tovuti ya onyesho
+
+Jaribu API bila kuandika msimbo: **[onyesho la moja kwa moja](https://play-api.faizankhichi.me/demo)** — ukurasa rahisi wa kutafuta uliojengwa kwa API hii. Tafuta programu, chuja za bure/zilipwa, fungua kadi kwa maelezo kamili na picha za skrini, na gusa **Join Beta** ili kufungua ukurasa wa programu ya beta ya programu.
+
+Onyesho hili ni mfano: hii ndiyo unayoweza kujenga kwa API hii. Msimbo wake uko katika [example-site/](https://github.com/FAK-LABS/playstore-search-api/tree/main/example-site) — faili moja tuli la `index.html` pamoja na README fupi. Inakili, ipangishe popote, au ifungue kama ilivyo; inaita API ya moja kwa moja, bila ufunguo.
+
+
 ## Anza haraka
 
 ```bash

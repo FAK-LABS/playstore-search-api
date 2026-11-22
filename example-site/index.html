@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Play Store Search API — Demo</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0a0a0a; color: #ededed; font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  a { color: #8ab4ff; }
+  header { max-width: 960px; margin: 0 auto; padding: 32px 16px 8px; }
+  h1 { font-size: 26px; margin: 0 0 8px; letter-spacing: -0.5px; }
+  .showcase { color: #a89f91; font-size: 15px; margin: 0 0 20px; line-height: 1.5; }
+  .showcase a { color: #ededed; }
+  .searchbar { display: flex; gap: 8px; flex-wrap: wrap; }
+  .searchbar input[type="text"] { flex: 1; min-width: 200px; padding: 12px 14px; font-size: 16px; border: 1px solid #333; border-radius: 8px; background: #141414; color: #ededed; outline: none; }
+  .searchbar input[type="text"]:focus { border-color: #8ab4ff; }
+  .searchbar select, .searchbar button { padding: 12px 14px; font-size: 15px; border: 1px solid #333; border-radius: 8px; background: #1c1c1c; color: #ededed; cursor: pointer; }
+  .searchbar button { background: #ededed; color: #0a0a0a; border-color: #ededed; font-weight: 600; }
+  .betanote { font-size: 13px; color: #888; margin: 10px 0 0; }
+  main { max-width: 960px; margin: 0 auto; padding: 16px; }
+  #status { color: #a89f91; margin: 8px 0 16px; font-size: 14px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+  .card { background: #141414; border: 1px solid #262626; border-radius: 12px; padding: 14px; cursor: pointer; }
+  .card:hover { border-color: #555; }
+  .cardtop { display: flex; gap: 12px; }
+  .cardtop img { width: 56px; height: 56px; border-radius: 12px; object-fit: cover; background: #222; }
+  .cardname { font-weight: 700; font-size: 16px; }
+  .carddev { color: #a89f91; font-size: 13px; margin-top: 2px; }
+  .cardmeta { font-size: 13px; color: #ccc; margin-top: 10px; line-height: 1.6; }
+  .cardmeta .price { color: #7ee2a0; }
+  .beta { display: inline-block; margin-top: 12px; padding: 8px 14px; border-radius: 8px; background: #ededed; color: #0a0a0a; font-weight: 600; font-size: 14px; text-decoration: none; }
+  .beta:hover { background: #fff; }
+  .detail { background: #141414; border: 1px solid #262626; border-radius: 12px; padding: 20px; }
+  .detail img.hero { width: 100%; max-height: 220px; object-fit: cover; border-radius: 10px; background: #222; }
+  .detail h2 { margin: 14px 0 4px; }
+  .detail .dev { color: #a89f91; font-size: 14px; }
+  .detail .desc { white-space: pre-wrap; line-height: 1.6; font-size: 15px; }
+  .shots { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; }
+  .shots img { height: 220px; border-radius: 8px; }
+  .hist { margin: 8px 0; }
+  .histrow { display: flex; align-items: center; gap: 8px; font-size: 13px; margin: 4px 0; }
+  .histrow .lbl { width: 28px; }
+  .histrow .bar { flex: 1; height: 8px; background: #262626; border-radius: 4px; overflow: hidden; }
+  .histrow .bar i { display: block; height: 100%; background: #e8b93e; }
+  .histrow .num { width: 90px; text-align: right; color: #a89f91; }
+  .back { background: none; border: 1px solid #444; color: #ededed; border-radius: 8px; padding: 8px 12px; cursor: pointer; font-size: 14px; margin-bottom: 12px; }
+  footer { max-width: 960px; margin: 0 auto; padding: 24px 16px 40px; color: #888; font-size: 13px; line-height: 1.6; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Play Store Search — Demo</h1>
+  <p class="showcase">Built with the <a href="https://github.com/FAK-LABS/playstore-search-api" target="_blank" rel="noopener">Play Store Search API</a> — this is what you can build with it. Search any app on Google Play, no key, no login. <a href="https://play-api.faizankhichi.me/?q=whatsapp" target="_blank" rel="noopener">See the raw API</a>.</p>
+  <div class="searchbar">
+    <input id="q" type="text" placeholder="Search apps… e.g. whatsapp" value="whatsapp" autocomplete="off">
+    <select id="price" aria-label="Price">
+      <option value="all">All prices</option>
+      <option value="free">Free</option>
+      <option value="paid">Paid</option>
+    </select>
+    <select id="sort" aria-label="Sort">
+      <option value="relevance">Sort: Relevance</option>
+      <option value="rating">Sort: Rating</option>
+      <option value="installs">Sort: Installs</option>
+      <option value="updated">Sort: Recently updated</option>
+    </select>
+    <button id="go" type="button">Search</button>
+  </div>
+  <p class="betanote">Join Beta opens the app&rsquo;s Google Play beta page — sign in there to see if the program is open, full, or unavailable.</p>
+</header>
+<main>
+  <div id="status"></div>
+  <div id="detail" class="hidden"></div>
+  <div id="grid" class="grid"></div>
+</main>
+<footer>
+  Demo for the <a href="https://github.com/FAK-LABS/playstore-search-api" target="_blank" rel="noopener">Play Store Search API</a> by <a href="https://faizankhichi.me/" target="_blank" rel="noopener">FAK LABS</a> — endpoint <a href="https://play-api.faizankhichi.me/" target="_blank" rel="noopener">play-api.faizankhichi.me</a>. Example code: <a href="https://github.com/FAK-LABS/playstore-search-api/tree/main/example-site" target="_blank" rel="noopener">example-site/</a> in the API repo.
+</footer>
+<script>
+(function () {
+  var API = "https://play-api.faizankhichi.me";
+  var qEl = document.getElementById("q");
+  var priceEl = document.getElementById("price");
+  var sortEl = document.getElementById("sort");
+  var gridEl = document.getElementById("grid");
+  var detailEl = document.getElementById("detail");
+  var statusEl = document.getElementById("status");
+
+  function esc(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  }
+  function fmt(n) {
+    if (n == null) return "—";
+    return Number(n).toLocaleString("en-US");
+  }
+  function stars(a) {
+    if (a.score == null) return "No rating yet";
+    var r = a.ratings != null ? " (" + fmt(a.ratings) + " ratings)" : "";
+    return "★ " + Number(a.score).toFixed(1) + r;
+  }
+  function priceText(a) {
+    if (a.priceText) return a.priceText;
+    if (a.free === true) return "Free";
+    if (a.free === false) return "Paid";
+    return "—";
+  }
+  function betaBtn(a) {
+    var url = a.beta && a.beta.joinUrl ? a.beta.joinUrl : ("https://play.google.com/apps/testing/" + a.package);
+    return '<a class="beta" href="' + esc(url) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">Join Beta</a>';
+  }
+  function cardHtml(a) {
+    var meta = stars(a) + "<br>" + esc(a.installs || "—") + " installs · " + esc(a.genre || "—") + "<br>" +
+      '<span class="price">' + esc(priceText(a)) + "</span>" +
+      (a.containsAds ? " · Contains ads" : "") + (a.offersIAP ? " · In-app purchases" : "");
+    return '<div class="card" data-pkg="' + esc(a.package) + '">' +
+      '<div class="cardtop"><img src="' + esc(a.icon || "") + '" alt="" loading="lazy">' +
+      '<div><div class="cardname">' + esc(a.name) + "</div>" +
+      '<div class="carddev">' + esc(a.developer && a.developer.name ? a.developer.name : "") + "</div></div></div>" +
+      '<div class="cardmeta">' + meta + "</div>" + betaBtn(a) + "</div>";
+  }
+  function histHtml(h) {
+    if (!h) return "";
+    var max = Math.max(h["1"] || 0, h["2"] || 0, h["3"] || 0, h["4"] || 0, h["5"] || 0, 1);
+    var out = '<div class="hist">';
+    [5, 4, 3, 2, 1].forEach(function (s) {
+      var v = h[String(s)] || 0;
+      var pct = Math.round((v / max) * 100);
+      out += '<div class="histrow"><span class="lbl">' + s + "★</span>" +
+        '<span class="bar"><i style="width:' + pct + '%"></i></span>' +
+        '<span class="num">' + fmt(v) + "</span></div>";
+    });
+    return out + "</div>";
+  }
+  function shotsHtml(shots) {
+    if (!shots || !shots.length) return "";
+    var out = '<h3>Screenshots</h3><div class="shots">';
+    shots.forEach(function (u) {
+      out += '<img src="' + esc(u) + '" alt="Screenshot" loading="lazy">';
+    });
+    return out + "</div>";
+  }
+  function detailHtml(a) {
+    var dev = a.developer || {};
+    var contact = [];
+    if (dev.email) contact.push('<a href="mailto:' + esc(dev.email) + '">' + esc(dev.email) + "</a>");
+    if (dev.website) contact.push('<a href="' + esc(dev.website) + '" target="_blank" rel="noopener">Website</a>');
+    if (dev.address) contact.push(esc(dev.address));
+    var facts = [];
+    if (a.version) facts.push("Version " + esc(a.version));
+    if (a.updated) facts.push("Updated " + esc(a.updated));
+    if (a.released) facts.push("Released " + esc(a.released));
+    if (a.androidVersion) facts.push("Android " + esc(a.androidVersion));
+    if (a.contentRating) facts.push("Rated " + esc(a.contentRating));
+    if (a.editorsChoice) facts.push("Editors' Choice");
+    if (a.chartRank && a.chartRank.rank) facts.push(esc(a.chartRank.chart) + " " + esc(a.chartRank.rank));
+    return '<button class="back" id="backBtn" type="button">&larr; Back to results</button>' +
+      '<div class="detail">' +
+      (a.headerImage ? '<img class="hero" src="' + esc(a.headerImage) + '" alt="">' : "") +
+      "<h2>" + esc(a.name) + "</h2>" +
+      '<div class="dev">' + esc(dev.name || "") + " · " + esc(a.package) + "</div>" +
+      '<p class="cardmeta">' + stars(a) + " · " + esc(a.installs || "—") + " installs · " + esc(priceText(a)) + "</p>" +
+      (facts.length ? "<p class=\"cardmeta\">" + facts.join(" · ") + "</p>" : "") +
+      betaBtn(a) +
+      (a.summary ? "<p><strong>" + esc(a.summary) + "</strong></p>" : "") +
+      (a.description ? '<p class="desc">' + esc(a.description) + "</p>" : "") +
+      shotsHtml(a.screenshots) +
+      (a.histogram ? "<h3>Ratings</h3>" + histHtml(a.histogram) : "") +
+      (a.recentChanges ? "<h3>What&rsquo;s new</h3><p class=\"desc\">" + esc(a.recentChanges) + "</p>" : "") +
+      (contact.length ? "<h3>Developer</h3><p class=\"cardmeta\">" + contact.join("<br>") + "</p>" : "") +
+      (a.privacyPolicy ? '<p><a href="' + esc(a.privacyPolicy) + '" target="_blank" rel="noopener">Privacy policy</a></p>' : "") +
+      '<p><a href="' + esc(a.url) + '" target="_blank" rel="noopener">Open on Google Play</a></p>' +
+      "</div>";
+  }
+
+  function showGrid() {
+    detailEl.classList.add("hidden");
+    detailEl.innerHTML = "";
+    gridEl.classList.remove("hidden");
+  }
+  function openDetail(pkg) {
+    statusEl.textContent = "Loading details…";
+    fetch(API + "/app?id=" + encodeURIComponent(pkg))
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (!d.success || !d.app) { statusEl.textContent = "Could not load that app."; return; }
+        gridEl.classList.add("hidden");
+        detailEl.innerHTML = detailHtml(d.app);
+        detailEl.classList.remove("hidden");
+        statusEl.textContent = "";
+        document.getElementById("backBtn").addEventListener("click", showGrid);
+        window.scrollTo(0, 0);
+      })
+      .catch(function () { statusEl.textContent = "Could not load that app. Check your connection and try again."; });
+  }
+
+  function search() {
+    var q = qEl.value.trim();
+    if (!q) { statusEl.textContent = "Type something to search."; return; }
+    showGrid();
+    statusEl.textContent = "Searching…";
+    gridEl.innerHTML = "";
+    var url = API + "/?q=" + encodeURIComponent(q) +
+      "&price=" + encodeURIComponent(priceEl.value) +
+      "&sort=" + encodeURIComponent(sortEl.value) + "&maxResults=12";
+    fetch(url)
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (!d.success) { statusEl.textContent = "Search failed: " + (d.error || "unknown error"); return; }
+        var res = d.results || [];
+        if (!res.length) { statusEl.textContent = "No apps found for “" + q + "”. Try another search."; return; }
+        statusEl.textContent = res.length + " result" + (res.length === 1 ? "" : "s") + " for “" + q + "” — click a card for full details.";
+        var html = "";
+        res.forEach(function (a) { html += cardHtml(a); });
+        gridEl.innerHTML = html;
+        var cards = gridEl.querySelectorAll(".card");
+        cards.forEach(function (c) {
+          c.addEventListener("click", function () { openDetail(c.getAttribute("data-pkg")); });
+        });
+      })
+      .catch(function () { statusEl.textContent = "Search failed. Check your connection and try again."; });
+  }
+
+  document.getElementById("go").addEventListener("click", search);
+  qEl.addEventListener("keydown", function (e) { if (e.key === "Enter") search(); });
+  priceEl.addEventListener("change", search);
+  sortEl.addEventListener("change", search);
+  search();
+})();
+</script>
+</body>
+</html>
