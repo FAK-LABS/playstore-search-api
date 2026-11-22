@@ -40,13 +40,13 @@ data.results.forEach(a => console.log(a.name, a.package, a.score, a.installs));
 | المعامل | القيم | الافتراضي | ملاحظات |
 |---|---|---|---|
 | `q` | نص البحث (بحد أقصى 200 حرف) | — | **مطلوب.** |
-| `category` | معرّف فئة متجر Play، مثل `communication` و`game_arcade` و`education` و`tools` و`photography` و`game_puzzle` | — | يحتاج `details=full` (الافتراضي). غير حساس لحالة الأحرف؛ الاسم المعروض يعمل أيضًا (`Communication`). |
-| `price` | `free` أو `paid` أو `all` | `all` | |
-| `sort` | `relevance` أو `rating` أو `installs` أو `updated` | `relevance` | `updated` يحتاج `details=full` (الافتراضي). |
+| `category` | معرّف فئة متجر Play، مثل `communication` و`game_arcade` و`education` و`tools` و`photography` و`game_puzzle` | — | يستلزم `details=full` (يجلب صفحات التفاصيل). غير حساس لحالة الأحرف؛ الاسم المعروض يعمل أيضًا (`Communication`). |
+| `price` | `free` أو `paid` أو `all` | `all` | تُرشَّح بواسطة Play نفسها، فلا يكلّف مكالمات إضافية. |
+| `sort` | `relevance` أو `rating` أو `installs` أو `updated` | `relevance` | `installs` و`updated` يستلزمان `details=full`. أما `rating` فيرتّب حسب تقييم النجوم المطبوع على كل بطاقة. |
 | `hl` | رمز اللغة، مثل `en` و`ur` و`es` | `en` | لغة واجهة النتائج. |
 | `gl` | رمز المنطقة، مثل `US` و`PK` و`ES` | `US` | المنطقة التي تُوطَّن لها النتائج. |
 | `maxResults` | 1–30 | `20` | صفحة بحث Play تعرض 30 تطبيقًا كحد أقصى لكل استعلام، لذا النتائج محدودة بـ 30. |
-| `details` | `full` أو `basic` | `full` | `full` يجلب صفحة تفاصيل كل تطبيق (بيانات كاملة). `basic` أسرع لكنه أقل — انظر أدناه. |
+| `details` | `full` أو `basic` | `basic` | `basic` (الافتراضي) يقرأ صفحة بحث واحدة فقط — مكالمة واحدة. `full` يجلب صفحة تفاصيل كل تطبيق (بيانات كاملة). |
 
 الفلاتر تتجمع بحرية — كل المعاملات تعمل معًا:
 
@@ -91,7 +91,7 @@ curl "https://play-api.faizankhichi.me/app?id=com.mojang.minecraftpe"
 
 ### مثال على الاستجابة
 
-`GET https://play-api.faizankhichi.me/?q=whatsapp&maxResults=1`
+`GET https://play-api.faizankhichi.me/?q=whatsapp&maxResults=1&details=full`
 
 ```json
 {
@@ -270,7 +270,7 @@ curl "https://play-api.faizankhichi.me/app?id=com.mojang.minecraftpe"
 
 ## details=basic
 
-`details=basic` يتخطى جلب صفحة تفاصيل كل تطبيق، لذا هو أسرع — لكنه أقل. صفحة البحث تعرض البيانات الكاملة (التقييمات والتثبيتات والسعر والملخص والشارات) للنتيجة **الأولى** فقط؛ النتائج من الثانية فصاعدًا صفوف مدمجة تحمل الاسم والمطوّر وتقييم النجوم والأيقونة فقط. في الوضع basic تعود تلك الحقول `null` بدلًا من تخمينها. استخدم `details=full` (الافتراضي) عندما تحتاج بيانات كاملة.
+`details=basic` هو الافتراضي: مكالمة واحدة — صفحة البحث فقط، ولا شيء غيرها. وهو أقل بالتصميم. صفحة البحث تعرض البيانات الكاملة (التقييمات والتثبيتات والسعر والملخص والشارات) للنتيجة **الأولى** فقط؛ النتائج من الثانية فصاعدًا صفوف مدمجة تحمل الاسم والمطوّر وتقييم النجوم والأيقونة فقط. في الوضع basic تعود تلك الحقول `null` بدلًا من تخمينها. كل صف ما زال يحمل تقييم نجومه، لذا يعمل `sort=rating` في الوضع basic، كما أن `price` ترشَّحه Play نفسها دون مكالمات إضافية. صفحات التفاصيل لا تُجلب إلا لغرض: مرّر `details=full` صراحةً، أو اطلب شيئًا يحتاج حقلًا من التفاصيل فقط — `category` (الفئة)، `sort=installs` (عدد التثبيتات)، `sort=updated` (تاريخ التحديث). في تلك الحالات تجلب API صفحات التفاصيل ويكون `details` المعاد في الرد `"full"`.
 
 ## الأخطاء
 

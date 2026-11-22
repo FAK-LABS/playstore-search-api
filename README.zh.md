@@ -40,13 +40,13 @@ data.results.forEach(a => console.log(a.name, a.package, a.score, a.installs));
 | 参数 | 取值 | 默认值 | 说明 |
 |---|---|---|---|
 | `q` | 搜索文本（最多 200 个字符） | — | **必填。** |
-| `category` | Play Store 类别 id，例如 `communication`、`game_arcade`、`education`、`tools`、`photography`、`game_puzzle` | — | 需要 `details=full`（默认值）。不区分大小写；显示名称也可以（`Communication`）。 |
-| `price` | `free`、`paid`、`all` | `all` | |
-| `sort` | `relevance`、`rating`、`installs`、`updated` | `relevance` | `updated` 需要 `details=full`（默认值）。 |
+| `category` | Play Store 类别 id，例如 `communication`、`game_arcade`、`education`、`tools`、`photography`、`game_puzzle` | — | 意味着 `details=full`（会抓取详情页）。不区分大小写；显示名称也可以（`Communication`）。 |
+| `price` | `free`、`paid`、`all` | `all` | 由 Play 自行过滤，无需额外调用。 |
+| `sort` | `relevance`、`rating`、`installs`、`updated` | `relevance` | `installs` 和 `updated` 意味着 `details=full`。`rating` 按每张卡片上印制的星级评分排序。 |
 | `hl` | 语言代码，例如 `en`、`ur`、`es` | `en` | 结果的界面语言。 |
 | `gl` | 地区代码，例如 `US`、`PK`、`ES` | `US` | 结果本地化的地区。 |
 | `maxResults` | 1–30 | `20` | Play 搜索页面每次查询最多列出约 30 个应用，因此结果上限为 30。 |
-| `details` | `full`、`basic` | `full` | `full` 会抓取每个应用的详情页（完整数据）。`basic` 更快但更简略——见下文。 |
+| `details` | `full`、`basic` | `basic` | `basic`（默认值）只读取一个搜索页面——1 次调用。`full` 会抓取每个应用的详情页（完整数据）。 |
 
 筛选条件可自由组合——所有参数都可一起使用：
 
@@ -91,7 +91,7 @@ curl "https://play-api.faizankhichi.me/app?id=com.mojang.minecraftpe"
 
 ### 响应示例
 
-`GET https://play-api.faizankhichi.me/?q=whatsapp&maxResults=1`
+`GET https://play-api.faizankhichi.me/?q=whatsapp&maxResults=1&details=full`
 
 ```json
 {
@@ -270,7 +270,7 @@ curl "https://play-api.faizankhichi.me/app?id=com.mojang.minecraftpe"
 
 ## details=basic
 
-`details=basic` 会跳过抓取每个应用的详情页，因此更快——但更简略。搜索页面仅为**第一个**结果渲染完整元数据（评分、安装量、价格、摘要、徽章）；第 2 个及之后的结果是紧凑行，仅包含名称、开发者、星级评分和图标。在 basic 模式下，这些字段返回 `null` 而不是猜测值。需要完整数据时请使用 `details=full`（默认值）。
+`details=basic` 是默认值：仅一次调用——仅搜索页面，别无其他。这是特意设计的简略模式。搜索页面仅为**第一个**结果渲染完整元数据（评分、安装量、价格、摘要、徽章）；第 2 个及之后的结果是紧凑行，仅包含名称、开发者、星级评分和图标。在 basic 模式下，这些字段返回 `null` 而不是猜测值。每行仍然带有自己的星级评分，因此 `sort=rating` 在 basic 模式下可用，而 `price` 由 Play 自行过滤，无需额外调用。详情页仅在有明确目的时才抓取：显式传入 `details=full`，或请求需要详情字段的内容——`category`（类别）、`sort=installs`（安装量）、`sort=updated`（更新日期）。在这些情况下，API 会抓取详情页，响应中回显的 `details` 为 `"full"`。
 
 ## 错误
 

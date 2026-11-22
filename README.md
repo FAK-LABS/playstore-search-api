@@ -40,13 +40,13 @@ data.results.forEach(a => console.log(a.name, a.package, a.score, a.installs));
 | Parameter | Values | Default | Notes |
 |---|---|---|---|
 | `q` | search text (max 200 chars) | — | **Required.** |
-| `category` | Play Store genre id, e.g. `communication`, `game_arcade`, `education`, `tools`, `photography`, `game_puzzle` | — | Needs `details=full` (the default). Case-insensitive; the display name works too (`Communication`). |
-| `price` | `free`, `paid`, `all` | `all` | |
-| `sort` | `relevance`, `rating`, `installs`, `updated` | `relevance` | `updated` needs `details=full` (the default). |
+| `category` | Play Store genre id, e.g. `communication`, `game_arcade`, `education`, `tools`, `photography`, `game_puzzle` | — | Implies `details=full` (fetches detail pages). Case-insensitive; the display name works too (`Communication`). |
+| `price` | `free`, `paid`, `all` | `all` | Filtered by Play itself, so it costs no extra calls. |
+| `sort` | `relevance`, `rating`, `installs`, `updated` | `relevance` | `installs` and `updated` imply `details=full`. `rating` sorts on the star rating printed on every card. |
 | `hl` | language code, e.g. `en`, `ur`, `es` | `en` | Interface language of the results. |
 | `gl` | region code, e.g. `US`, `PK`, `ES` | `US` | Region the results are localised for. |
 | `maxResults` | 1–30 | `20` | The Play search page lists at most ~30 apps per query, so results cap at 30. |
-| `details` | `full`, `basic` | `full` | `full` fetches every app's details page (complete data). `basic` is faster but thin — see below. |
+| `details` | `full`, `basic` | `basic` | `basic` (default) reads one search page only — 1 upstream call. `full` fetches every app's details page (complete data). |
 
 Filters combine freely — every parameter works together:
 
@@ -91,7 +91,7 @@ Top-level fields:
 
 ### Example response
 
-`GET https://play-api.faizankhichi.me/?q=whatsapp&maxResults=1`
+`GET https://play-api.faizankhichi.me/?q=whatsapp&maxResults=1&details=full`
 
 ```json
 {
@@ -268,9 +268,11 @@ Use `beta.joinUrl` as the **Join beta** button in your app or site — it opens 
 
 There is no page token. Play's web search has no stable pagination — the search page lists at most ~30 apps for a query, and `maxResults` caps at 30. Asking for more returns the same 30.
 
-## details=basic
+## details=basic (the default)
 
-`details=basic` skips the per-app details fetch, so it is faster — but thinner. The search page only renders full metadata (reviews, installs, price, summary, badges) for the **first** result; results 2+ are compact rows carrying only name, developer, star rating and icon. In basic mode those fields come back `null` rather than guessed. Use `details=full` (the default) whenever you need complete data.
+`details=basic` is the default: one upstream call — the search page only, nothing else. It is thinner by design. The search page only renders full metadata (reviews, installs, price, summary, badges) for the **first** result; results 2+ are compact rows carrying only name, developer, star rating and icon. In basic mode those fields come back `null` rather than guessed. Every row still carries its star rating, so `sort=rating` works in basic mode, and `price` is filtered by Play itself, so it costs no extra calls either.
+
+Detail pages are fetched only on purpose: pass `details=full` explicitly, or ask for something that needs a detail-only field — `category` (genre), `sort=installs` (install counts), `sort=updated` (updated date). In those cases the API fetches the detail pages and the echoed `details` in the response reads `"full"`.
 
 ## Errors
 

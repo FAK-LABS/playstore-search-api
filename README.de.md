@@ -40,13 +40,13 @@ data.results.forEach(a => console.log(a.name, a.package, a.score, a.installs));
 | Parameter | Werte | Standard | Hinweise |
 |---|---|---|---|
 | `q` | Suchtext (max. 200 Zeichen) | — | **Pflicht.** |
-| `category` | Play-Store-Genre-ID, z. B. `communication`, `game_arcade`, `education`, `tools`, `photography`, `game_puzzle` | — | Braucht `details=full` (Standard). Groß-/Kleinschreibung egal; auch der Anzeigename funktioniert (`Communication`). |
-| `price` | `free`, `paid`, `all` | `all` | |
-| `sort` | `relevance`, `rating`, `installs`, `updated` | `relevance` | `updated` braucht `details=full` (Standard). |
+| `category` | Play-Store-Genre-ID, z. B. `communication`, `game_arcade`, `education`, `tools`, `photography`, `game_puzzle` | — | Bedeutet `details=full` (lädt Detailseiten). Groß-/Kleinschreibung egal; auch der Anzeigename funktioniert (`Communication`). |
+| `price` | `free`, `paid`, `all` | `all` | Wird von Play selbst gefiltert, kostet also keine zusätzlichen Aufrufe. |
+| `sort` | `relevance`, `rating`, `installs`, `updated` | `relevance` | `installs` und `updated` bedeuten `details=full`. `rating` sortiert nach der Sternebewertung, die auf jeder Karte steht. |
 | `hl` | Sprachcode, z. B. `en`, `ur`, `es` | `en` | Oberflächensprache der Ergebnisse. |
 | `gl` | Regionscode, z. B. `US`, `PK`, `ES` | `US` | Region, für die die Ergebnisse lokalisiert sind. |
 | `maxResults` | 1–30 | `20` | Die Play-Suchseite listet höchstens ~30 Apps pro Anfrage, daher sind die Ergebnisse auf 30 begrenzt. |
-| `details` | `full`, `basic` | `full` | `full` lädt die Detailseite jeder App (vollständige Daten). `basic` ist schneller, aber dünner — siehe unten. |
+| `details` | `full`, `basic` | `basic` | `basic` (Standard) liest nur eine Suchseite — 1 Aufruf. `full` lädt die Detailseite jeder App (vollständige Daten). |
 
 Filter lassen sich frei kombinieren — alle Parameter funktionieren zusammen:
 
@@ -91,7 +91,7 @@ Felder der obersten Ebene:
 
 ### Beispielantwort
 
-`GET https://play-api.faizankhichi.me/?q=whatsapp&maxResults=1`
+`GET https://play-api.faizankhichi.me/?q=whatsapp&maxResults=1&details=full`
 
 ```json
 {
@@ -270,7 +270,7 @@ Es gibt kein Seiten-Token. Die Play-Websuche hat keine stabile Paginierung — d
 
 ## details=basic
 
-`details=basic` überspringt das Laden der Detailseite jeder App, ist also schneller — aber dünner. Die Suchseite rendert vollständige Metadaten (Bewertungen, Installationen, Preis, Zusammenfassung, Abzeichen) nur für das **erste** Ergebnis; die Ergebnisse 2+ sind kompakte Zeilen mit nur Name, Entwickler, Sternebewertung und Icon. Im Basic-Modus kommen diese Felder als `null` zurück, statt geraten zu werden. Verwenden Sie `details=full` (Standard), wenn Sie vollständige Daten brauchen.
+`details=basic` ist der Standard: ein einziger Aufruf — nur die Suchseite, sonst nichts. Es ist bewusst dünner. Die Suchseite rendert vollständige Metadaten (Bewertungen, Installationen, Preis, Zusammenfassung, Abzeichen) nur für das **erste** Ergebnis; die Ergebnisse 2+ sind kompakte Zeilen mit nur Name, Entwickler, Sternebewertung und Icon. Im Basic-Modus kommen diese Felder als `null` zurück, statt geraten zu werden. Jede Zeile trägt trotzdem ihre Sternebewertung, also funktioniert `sort=rating` im Basic-Modus, und `price` wird von Play selbst gefiltert, ohne zusätzliche Aufrufe. Detailseiten werden nur mit einem Zweck geladen: übergeben Sie `details=full` ausdrücklich, oder verlangen Sie etwas, das ein Detail-Feld braucht — `category` (Genre), `sort=installs` (Installationen), `sort=updated` (Aktualisierungsdatum). In diesen Fällen lädt die API die Detailseiten und das zurückgegebene `details` in der Antwort lautet `"full"`.
 
 ## Fehler
 

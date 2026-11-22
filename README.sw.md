@@ -40,13 +40,13 @@ data.results.forEach(a => console.log(a.name, a.package, a.score, a.installs));
 | Kigezo | Thamani | Chaguo-msingi | Maelezo |
 |---|---|---|---|
 | `q` | maandishi ya utafutaji (herufi 200 kama kiwango cha juu) | — | **Lazima.** |
-| `category` | id ya aina ya Play Store, mf. `communication`, `game_arcade`, `education`, `tools`, `photography`, `game_puzzle` | — | Inahitaji `details=full` (chaguo-msingi). Haijali herufi kubwa/ndogo; jina linaloonyeshwa pia linafanya kazi (`Communication`). |
-| `price` | `free`, `paid`, `all` | `all` | |
-| `sort` | `relevance`, `rating`, `installs`, `updated` | `relevance` | `updated` inahitaji `details=full` (chaguo-msingi). |
+| `category` | id ya aina ya Play Store, mf. `communication`, `game_arcade`, `education`, `tools`, `photography`, `game_puzzle` | — | Inamaanisha `details=full` (inachukua kurasa za maelezo). Haijali herufi kubwa/ndogo; jina linaloonyeshwa pia linafanya kazi (`Communication`). |
+| `price` | `free`, `paid`, `all` | `all` | Huchujwa na Play yenyewe, bila simu za ziada. |
+| `sort` | `relevance`, `rating`, `installs`, `updated` | `relevance` | `installs` na `updated` zinamaanisha `details=full`. `rating` hupanga kwa alama ya nyota iliyochapishwa kwenye kila kadi. |
 | `hl` | msimbo wa lugha, mf. `en`, `ur`, `es` | `en` | Lugha ya kiolesura cha matokeo. |
 | `gl` | msimbo wa eneo, mf. `US`, `PK`, `ES` | `US` | Eneo ambalo matokeo yamelengwa. |
 | `maxResults` | 1–30 | `20` | Ukurasa wa utafutaji wa Play unaorodhesha programu ~30 kama kiwango cha juu kwa swali moja, kwa hivyo matokeo yamewekewa kikomo cha 30. |
-| `details` | `full`, `basic` | `full` | `full` inachukua ukurasa wa maelezo ya kila programu (data kamili). `basic` ni haraka lakini nyepesi — tazama hapa chini. |
+| `details` | `full`, `basic` | `basic` | `basic` (chaguo-msingi) inasoma ukurasa mmoja wa utafutaji tu — simu 1. `full` inachukua ukurasa wa maelezo ya kila programu (data kamili). |
 
 Vichujio vinachanganyika kwa uhuru — kila kigezo kinafanya kazi pamoja:
 
@@ -91,7 +91,7 @@ Sehemu za ngazi ya juu:
 
 ### Mfano wa jibu
 
-`GET https://play-api.faizankhichi.me/?q=whatsapp&maxResults=1`
+`GET https://play-api.faizankhichi.me/?q=whatsapp&maxResults=1&details=full`
 
 ```json
 {
@@ -270,7 +270,7 @@ Hakuna token ya ukurasa. Utafutaji wa wavuti wa Play hauna kurasa thabiti — uk
 
 ## details=basic
 
-`details=basic` inaruka kuchukua ukurasa wa maelezo ya kila programu, kwa hivyo ni haraka — lakini nyepesi. Ukurasa wa utafutaji unaonyesha metadata kamili (alama, usakinishaji, bei, muhtasari, beji) kwa tokeo la **kwanza** tu; matokeo ya 2+ ni safu fupi zenye jina, msanidi, alama ya nyota na ikoni tu. Katika hali ya basic, sehemu hizo zinarudi `null` badala ya kubahatisha. Tumia `details=full` (chaguo-msingi) unapohitaji data kamili.
+`details=basic` ndiyo chaguo-msingi: simu moja tu — ukurasa wa utafutaji pekee, hakuna kingine. Ni nyepesi kwa muundo. Ukurasa wa utafutaji unaonyesha metadata kamili (alama, usakinishaji, bei, muhtasari, beji) kwa tokeo la **kwanza** tu; matokeo ya 2+ ni safu fupi zenye jina, msanidi, alama ya nyota na ikoni tu. Katika hali ya basic, sehemu hizo zinarudi `null` badala ya kubahatisha. Kila safu bado ina alama yake ya nyota, kwa hivyo `sort=rating` inafanya kazi katika hali ya basic, na `price` huchujwa na Play yenyewe bila simu za ziada. Kurasa za maelezo huchukuliwa kwa kusudi tu: pitisha `details=full` waziwazi, au omba kitu kinachohitaji sehemu ya maelezo pekee — `category` (aina), `sort=installs` (usakinishaji), `sort=updated` (tarehe ya sasisho). Katika hali hizo API inachukua kurasa za maelezo na `details` inayorudishwa kwenye jibu ni `"full"`.
 
 ## Makosa
 

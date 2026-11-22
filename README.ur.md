@@ -40,13 +40,13 @@ data.results.forEach(a => console.log(a.name, a.package, a.score, a.installs));
 | پیرامیٹر | اقدار | ڈیفالٹ | نوٹس |
 |---|---|---|---|
 | `q` | سرچ کا متن (زیادہ سے زیادہ 200 حروف) | — | **لازمی۔** |
-| `category` | Play Store کی کیٹگری id، جیسے `communication`، `game_arcade`، `education`، `tools`، `photography`، `game_puzzle` | — | `details=full` (ڈیفالٹ) درکار ہے۔ بڑے/چھوٹے حروف سے فرق نہیں پڑتا؛ دکھایا جانے والا نام بھی چلتا ہے (`Communication`)۔ |
-| `price` | `free`، `paid`، `all` | `all` | |
-| `sort` | `relevance`، `rating`، `installs`، `updated` | `relevance` | `updated` کے لیے `details=full` (ڈیفالٹ) درکار ہے۔ |
+| `category` | Play Store کی کیٹگری id، جیسے `communication`، `game_arcade`، `education`، `tools`، `photography`، `game_puzzle` | — | `details=full` (ڈیفالٹ) لاگو ہوتا ہے (تفصیلی صفحے لاتا ہے)۔ بڑے/چھوٹے حروف سے فرق نہیں پڑتا؛ دکھایا جانے والا نام بھی چلتا ہے (`Communication`)۔ |
+| `price` | `free`، `paid`، `all` | `all` | Play خود فلٹر کرتا ہے، اس لیے اضافی کالز نہیں لگتیں۔ |
+| `sort` | `relevance`، `rating`، `installs`، `updated` | `relevance` | `installs` اور `updated` سے `details=full` (ڈیفالٹ) لاگو ہوتا ہے۔ `rating` ہر کارڈ پر چھپی اسٹار ریٹنگ سے ترتیب دیتا ہے۔ |
 | `hl` | زبان کا کوڈ، جیسے `en`، `ur`، `es` | `en` | نتائج کی انٹرفیس زبان۔ |
 | `gl` | علاقے کا کوڈ، جیسے `US`، `PK`، `ES` | `US` | وہ علاقہ جس کے لیے نتائج مقامی کیے گئے ہوں۔ |
 | `maxResults` | 1–30 | `20` | Play کا سرچ صفحہ ہر سوال پر زیادہ سے زیادہ ~30 ایپس دکھاتا ہے، اس لیے نتائج 30 تک محدود ہیں۔ |
-| `details` | `full`، `basic` | `full` | `full` ہر ایپ کا تفصیلی صفحہ لاتا ہے (مکمل ڈیٹا)۔ `basic` تیز ہے مگر ہلکا — نیچے دیکھیں۔ |
+| `details` | `full`، `basic` | `basic` | `basic` (ڈیفالٹ) صرف ایک سرچ صفحہ پڑھتا ہے — 1 کال۔ `full` ہر ایپ کا تفصیلی صفحہ لاتا ہے (مکمل ڈیٹا)۔ |
 
 فلٹرز آزادانہ ملتے ہیں — ہر پیرامیٹر ایک ساتھ کام کرتا ہے:
 
@@ -91,7 +91,7 @@ curl "https://play-api.faizankhichi.me/app?id=com.mojang.minecraftpe"
 
 ### جواب کی مثال
 
-`GET https://play-api.faizankhichi.me/?q=whatsapp&maxResults=1`
+`GET https://play-api.faizankhichi.me/?q=whatsapp&maxResults=1&details=full`
 
 ```json
 {
@@ -270,7 +270,7 @@ curl "https://play-api.faizankhichi.me/app?id=com.mojang.minecraftpe"
 
 ## details=basic
 
-`details=basic` ہر ایپ کا تفصیلی صفحہ لانا چھوڑ دیتا ہے، اس لیے یہ تیز ہے — مگر ہلکا۔ سرچ صفحہ مکمل میٹا ڈیٹا (ریٹنگز، انسٹالز، قیمت، خلاصہ، بیجز) صرف **پہلے** نتیجے کے لیے دکھاتا ہے؛ دوسرے سے آگے کے نتائج مختصر قطاریں ہوتی ہیں جن میں صرف نام، ڈویلپر، اسٹار ریٹنگ اور آئیکن ہوتا ہے۔ basic موڈ میں وہ فیلڈز اندازے کے بجائے `null` آتے ہیں۔ مکمل ڈیٹا چاہیے تو `details=full` (ڈیفالٹ) استعمال کریں۔
+`details=basic` ڈیفالٹ ہے: صرف ایک کال — صرف سرچ صفحہ، اس کے علاوہ کچھ نہیں۔ یہ ڈیزائن کے لحاظ سے ہلکا ہے۔ سرچ صفحہ مکمل میٹا ڈیٹا (ریٹنگز، انسٹالز، قیمت، خلاصہ، بیجز) صرف **پہلے** نتیجے کے لیے دکھاتا ہے؛ دوسرے سے آگے کے نتائج مختصر قطاریں ہوتی ہیں جن میں صرف نام، ڈویلپر، اسٹار ریٹنگ اور آئیکن ہوتا ہے۔ basic موڈ میں وہ فیلڈز اندازے کے بجائے `null` آتے ہیں۔ ہر قطار میں پھر بھی اس کی اسٹار ریٹنگ ہوتی ہے، اس لیے `sort=rating` basic موڈ میں کام کرتا ہے، اور `price` کو Play خود فلٹر کرتا ہے، بغیر اضافی کالز کے۔ تفصیلی صفحے صرف مقصد سے لائے جاتے ہیں: `details=full` صاف طور پر دیں، یا ایسی چیز مانگیں جس کے لیے تفصیل کا فیلڈ چاہیے — `category` (کیٹگری)، `sort=installs` (انسٹالز)، `sort=updated` (اپڈیٹ کی تاریخ)۔ ان صورتوں میں API تفصیلی صفحے لاتا ہے اور جواب میں واپس آنے والا `details` `"full"` ہوتا ہے۔
 
 ## غلطیاں
 

@@ -403,6 +403,12 @@
     return '<a class="' + cls + '" href="' + esc(url) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">Join Beta</a>';
   }
   function cardHtml(a) {
+    // In basic mode rows 2+ carry no price flag (honest null) — but when
+    // the user picked Free/Paid, Play itself filtered the results, so
+    // every card on screen matches that filter. Show it instead of "—".
+    var badge = priceText(a);
+    if (badge === "—" && price === "free") badge = "Free";
+    if (badge === "—" && price === "paid") badge = "Paid";
     var foot = "<span>" + esc(a.installs || "—") + " installs</span>" +
       (a.genre ? '<span class="chip">' + esc(a.genre) + "</span>" : "");
     return '<div class="card" data-pkg="' + esc(a.package) + '">' +
@@ -410,7 +416,7 @@
       '<div class="card-head"><img src="' + esc(a.icon || "") + '" alt="" loading="lazy">' +
       '<div class="card-titles"><div class="card-name">' + esc(a.name) + "</div>" +
       '<div class="card-dev">' + esc(a.developer && a.developer.name ? a.developer.name : "") + "</div></div>" +
-      '<span class="price-badge">' + esc(priceText(a)) + "</span></div>" +
+      '<span class="price-badge">' + esc(badge) + "</span></div>" +
       '<div class="card-stars">' + starsLine(a) + "</div>" +
       '<div class="card-foot">' + foot + "</div>" +
       "</div>" + betaBtn(a, "beta") + "</div>";

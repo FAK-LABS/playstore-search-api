@@ -40,13 +40,13 @@ data.results.forEach(a => console.log(a.name, a.package, a.score, a.installs));
 | पैरामीटर | मान | डिफ़ॉल्ट | नोट्स |
 |---|---|---|---|
 | `q` | खोज का टेक्स्ट (अधिकतम 200 अक्षर) | — | **ज़रूरी।** |
-| `category` | Play Store की श्रेणी id, जैसे `communication`, `game_arcade`, `education`, `tools`, `photography`, `game_puzzle` | — | `details=full` (डिफ़ॉल्ट) चाहिए। बड़े/छोटे अक्षरों से फ़र्क नहीं पड़ता; दिखने वाला नाम भी चलता है (`Communication`)। |
-| `price` | `free`, `paid`, `all` | `all` | |
-| `sort` | `relevance`, `rating`, `installs`, `updated` | `relevance` | `updated` के लिए `details=full` (डिफ़ॉल्ट) चाहिए। |
+| `category` | Play Store की श्रेणी id, जैसे `communication`, `game_arcade`, `education`, `tools`, `photography`, `game_puzzle` | — | `details=full` (डिफ़ॉल्ट) लागू होता है (विवरण पृष्ठ लाता है)। बड़े/छोटे अक्षरों से फ़र्क नहीं पड़ता; दिखने वाला नाम भी चलता है (`Communication`)। |
+| `price` | `free`, `paid`, `all` | `all` | Play स्वयं फ़िल्टर करता है, इसलिए कोई अतिरिक्त कॉल नहीं लगती। |
+| `sort` | `relevance`, `rating`, `installs`, `updated` | `relevance` | `installs` और `updated` से `details=full` (डिफ़ॉल्ट) लागू होता है। `rating` हर कार्ड पर छपी स्टार रेटिंग से क्रमबद्ध करता है। |
 | `hl` | भाषा कोड, जैसे `en`, `ur`, `es` | `en` | नतीजों की इंटरफ़ेस भाषा। |
 | `gl` | क्षेत्र कोड, जैसे `US`, `PK`, `ES` | `US` | वह क्षेत्र जिसके लिए नतीजे स्थानीयकृत हैं। |
 | `maxResults` | 1–30 | `20` | Play का खोज पृष्ठ हर क्वेरी पर अधिकतम ~30 ऐप्स दिखाता है, इसलिए नतीजे 30 तक सीमित हैं। |
-| `details` | `full`, `basic` | `full` | `full` हर ऐप का विवरण पृष्ठ लाता है (पूरा डेटा)। `basic` तेज़ है पर हल्का — नीचे देखें। |
+| `details` | `full`, `basic` | `basic` | `basic` (डिफ़ॉल्ट) सिर्फ़ एक खोज पृष्ठ पढ़ता है — 1 कॉल। `full` हर ऐप का विवरण पृष्ठ लाता है (पूरा डेटा)। |
 
 फ़िल्टर स्वतंत्र रूप से मिलते हैं — हर पैरामीटर साथ काम करता है:
 
@@ -91,7 +91,7 @@ curl "https://play-api.faizankhichi.me/app?id=com.mojang.minecraftpe"
 
 ### जवाब का उदाहरण
 
-`GET https://play-api.faizankhichi.me/?q=whatsapp&maxResults=1`
+`GET https://play-api.faizankhichi.me/?q=whatsapp&maxResults=1&details=full`
 
 ```json
 {
@@ -270,7 +270,7 @@ curl "https://play-api.faizankhichi.me/app?id=com.mojang.minecraftpe"
 
 ## details=basic
 
-`details=basic` हर ऐप का विवरण पृष्ठ लाना छोड़ देता है, इसलिए यह तेज़ है — पर हल्का। खोज पृष्ठ पूरा मेटाडेटा (रेटिंग, इंस्टॉल, कीमत, सारांश, बैज) सिर्फ़ **पहले** नतीजे के लिए दिखाता है; दूसरे से आगे के नतीजे छोटी पंक्तियाँ होती हैं जिनमें सिर्फ़ नाम, डेवलपर, स्टार रेटिंग और आइकन होता है। basic मोड में वे फ़ील्ड अंदाज़े के बजाय `null` आते हैं। पूरा डेटा चाहिए तो `details=full` (डिफ़ॉल्ट) इस्तेमाल करें।
+`details=basic` डिफ़ॉल्ट है: सिर्फ़ एक कॉल — केवल खोज पृष्ठ, और कुछ नहीं। यह डिज़ाइन से हल्का है। खोज पृष्ठ पूरा मेटाडेटा (रेटिंग, इंस्टॉल, कीमत, सारांश, बैज) सिर्फ़ **पहले** नतीजे के लिए दिखाता है; दूसरे से आगे के नतीजे छोटी पंक्तियाँ होती हैं जिनमें सिर्फ़ नाम, डेवलपर, स्टार रेटिंग और आइकन होता है। basic मोड में वे फ़ील्ड अंदाज़े के बजाय `null` आते हैं। हर पंक्ति में फिर भी उसकी स्टार रेटिंग होती है, इसलिए `sort=rating` basic मोड में काम करता है, और `price` को Play स्वयं फ़िल्टर करता है, बिना अतिरिक्त कॉल के। विवरण पृष्ठ सिर्फ़ उद्देश्य से लाए जाते हैं: `details=full` साफ़ तौर पर दें, या ऐसी चीज़ माँगें जिसके लिए विवरण वाला फ़ील्ड चाहिए — `category` (श्रेणी), `sort=installs` (इंस्टॉल संख्या), `sort=updated` (अपडेट तारीख़)। उन मामलों में API विवरण पृष्ठ लाता है और जवाब में लौटने वाला `details` `"full"` होता है।
 
 ## त्रुटियाँ
 

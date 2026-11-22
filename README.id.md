@@ -40,13 +40,13 @@ data.results.forEach(a => console.log(a.name, a.package, a.score, a.installs));
 | Parameter | Nilai | Default | Catatan |
 |---|---|---|---|
 | `q` | teks pencarian (maks. 200 karakter) | — | **Wajib.** |
-| `category` | id genre Play Store, mis. `communication`, `game_arcade`, `education`, `tools`, `photography`, `game_puzzle` | — | Perlu `details=full` (default). Tidak peka huruf besar/kecil; nama tampilan juga bisa (`Communication`). |
-| `price` | `free`, `paid`, `all` | `all` | |
-| `sort` | `relevance`, `rating`, `installs`, `updated` | `relevance` | `updated` perlu `details=full` (default). |
+| `category` | id genre Play Store, mis. `communication`, `game_arcade`, `education`, `tools`, `photography`, `game_puzzle` | — | Berarti `details=full` (mengambil halaman detail). Tidak peka huruf besar/kecil; nama tampilan juga bisa (`Communication`). |
+| `price` | `free`, `paid`, `all` | `all` | Difilter oleh Play sendiri, jadi tanpa panggilan tambahan. |
+| `sort` | `relevance`, `rating`, `installs`, `updated` | `relevance` | `installs` dan `updated` berarti `details=full`. `rating` mengurutkan berdasarkan rating bintang yang tercetak di setiap kartu. |
 | `hl` | kode bahasa, mis. `en`, `ur`, `es` | `en` | Bahasa antarmuka hasil. |
 | `gl` | kode wilayah, mis. `US`, `PK`, `ES` | `US` | Wilayah tempat hasil dilokalkan. |
 | `maxResults` | 1–30 | `20` | Halaman pencarian Play menampilkan paling banyak ~30 aplikasi per kueri, jadi hasil dibatasi 30. |
-| `details` | `full`, `basic` | `full` | `full` mengambil halaman detail setiap aplikasi (data lengkap). `basic` lebih cepat tapi lebih tipis — lihat di bawah. |
+| `details` | `full`, `basic` | `basic` | `basic` (default) hanya membaca satu halaman pencarian — 1 panggilan. `full` mengambil halaman detail setiap aplikasi (data lengkap). |
 
 Filter dapat digabung bebas — semua parameter bekerja bersama:
 
@@ -91,7 +91,7 @@ Field tingkat atas:
 
 ### Contoh respons
 
-`GET https://play-api.faizankhichi.me/?q=whatsapp&maxResults=1`
+`GET https://play-api.faizankhichi.me/?q=whatsapp&maxResults=1&details=full`
 
 ```json
 {
@@ -270,7 +270,7 @@ Tidak ada token halaman. Pencarian web Play tidak memiliki pagination yang stabi
 
 ## details=basic
 
-`details=basic` melewati pengambilan halaman detail setiap aplikasi, jadi lebih cepat — tapi lebih tipis. Halaman pencarian hanya menampilkan metadata lengkap (rating, instalasi, harga, ringkasan, lencana) untuk hasil **pertama**; hasil ke-2 dan seterusnya adalah baris ringkas yang hanya membawa nama, developer, rating bintang, dan ikon. Dalam mode basic, field itu kembali `null` daripada ditebak. Gunakan `details=full` (default) saat Anda membutuhkan data lengkap.
+`details=basic` adalah default: satu panggilan saja — hanya halaman pencarian, tidak ada yang lain. Ini lebih tipis karena memang dirancang begitu. Halaman pencarian hanya menampilkan metadata lengkap (rating, instalasi, harga, ringkasan, lencana) untuk hasil **pertama**; hasil ke-2 dan seterusnya adalah baris ringkas yang hanya membawa nama, developer, rating bintang, dan ikon. Dalam mode basic, field itu kembali `null` daripada ditebak. Setiap baris tetap membawa rating bintangnya, jadi `sort=rating` berfungsi dalam mode basic, dan `price` difilter oleh Play sendiri tanpa panggilan tambahan. Halaman detail hanya diambil bila ada tujuannya: kirim `details=full` secara eksplisit, atau minta sesuatu yang butuh field khusus detail — `category` (genre), `sort=installs` (jumlah instalasi), `sort=updated` (tanggal update). Dalam kasus itu API mengambil halaman detail dan `details` yang dikembalikan dalam respons adalah `"full"`.
 
 ## Error
 

@@ -40,13 +40,13 @@ data.results.forEach(a => console.log(a.name, a.package, a.score, a.installs));
 | پیرامیټر | ارزښتونه | ډیفالټ | یادښتونه |
 |---|---|---|---|
 | `q` | د لټون متن (تر ۲۰۰ تورو پورې) | — | **اړین۔** |
-| `category` | د Play Store د کټګورۍ id، لکه `communication`، `game_arcade`، `education`، `tools`، `photography`، `game_puzzle` | — | `details=full` (ډیفالټ) ته اړتیا لري۔ په لویو/وړو تورو کې توپیر نه کوي؛ ښودل شوی نوم هم کار کوي (`Communication`)۔ |
-| `price` | `free`، `paid`، `all` | `all` | |
-| `sort` | `relevance`، `rating`، `installs`، `updated` | `relevance` | `updated` لپاره `details=full` (ډیفالټ) ته اړتیا ده۔ |
+| `category` | د Play Store د کټګورۍ id، لکه `communication`، `game_arcade`، `education`، `tools`، `photography`، `game_puzzle` | — | `details=full` (ډیفالټ) پلي کوي (د جزیاتو پاڼې راوړي)۔ په لویو/وړو تورو کې توپیر نه کوي؛ ښودل شوی نوم هم کار کوي (`Communication`)۔ |
+| `price` | `free`، `paid`، `all` | `all` | پخپله Play یې فلټر کوي، نو اضافي غوښتنو ته اړتیا نشته۔ |
+| `sort` | `relevance`، `rating`، `installs`، `updated` | `relevance` | `installs` او `updated` د `details=full` (ډیفالټ) معنی لري۔ `rating` په هر کارت کې د چاپ شوي ستورو له مخې ترتیبوي۔ |
 | `hl` | د ژبې کوډ، لکه `en`، `ur`، `es` | `en` | د پایلو د انټرفېس ژبه۔ |
 | `gl` | د سیمې کوډ، لکه `US`، `PK`، `ES` | `US` | هغه سیمه چې پایلې یې لپاره ځایي شوې دي۔ |
 | `maxResults` | 1–30 | `20` | د Play د لټون پاڼه هرې پوښتنې ته تر ټولو زیات ~30 اپلیکېشنونه ښيي، نو پایلې تر 30 پورې محدودې دي۔ |
-| `details` | `full`، `basic` | `full` | `full` د هر اپلیکېشن د جزیاتو پاڼه راوړي (بشپړ معلومات)۔ `basic` چټک دی خو لږ دی — لاندې وګورئ۔ |
+| `details` | `full`، `basic` | `basic` | `basic` (ډیفالټ) یوازې یو د لټون پاڼه لولي — 1 غوښتنه۔ `full` د هر اپلیکېشن د جزیاتو پاڼه راوړي (بشپړ معلومات)۔ |
 
 فلټرونه په آزاده توګه سره یو ځای کېږي — هر پیرامیټر یو ځای کار کوي:
 
@@ -91,7 +91,7 @@ curl "https://play-api.faizankhichi.me/app?id=com.mojang.minecraftpe"
 
 ### د ځواب بېلګه
 
-`GET https://play-api.faizankhichi.me/?q=whatsapp&maxResults=1`
+`GET https://play-api.faizankhichi.me/?q=whatsapp&maxResults=1&details=full`
 
 ```json
 {
@@ -270,7 +270,7 @@ curl "https://play-api.faizankhichi.me/app?id=com.mojang.minecraftpe"
 
 ## details=basic
 
-`details=basic` د هر اپلیکېشن د جزیاتو پاڼه راوړل پریږدي، نو چټک دی — خو لږ دی۔ د لټون پاڼه بشپړ میټاډاټا (درجه بندۍ، نصبونه، قیمت، لنډیز، بیجونه) یوازې د **لومړۍ** پایلې لپاره ښيي؛ له 2 څخه وروسته پایلې لنډې کرښې دي چې یوازې نوم، جوړوونکی، د ستورو درجه بندي او آیکون لري۔ په basic حالت کې هغه فیلډونه د اټکل کولو پر ځای `null` راځي۔ کله چې بشپړو معلوماتو ته اړتیا لرئ `details=full` (ډیفالټ) وکاروئ۔
+`details=basic` ډیفالټ دی: یوازې یو غوښتنه — یوازې د لټون پاڼه، بل څه نشته۔ دا په ډیزاین کې لږ دی۔ د لټون پاڼه بشپړ میټاډاټا (درجه بندۍ، نصبونه، قیمت، لنډیز، بیجونه) یوازې د **لومړۍ** پایلې لپاره ښيي؛ له 2 څخه وروسته پایلې لنډې کرښې دي چې یوازې نوم، جوړوونکی، د ستورو درجه بندي او آیکون لري۔ په basic حالت کې هغه فیلډونه د اټکل کولو پر ځای `null` راځي۔ هره کرښه بیا هم خپله د ستورو درجه بندي لري، نو `sort=rating` په basic حالت کې کار کوي، او `price` پخپله Play فلټر کوي، پرته له اضافي غوښتنو۔ د جزیاتو پاڼې یوازې په هدف راوړل کیږي: `details=full` په څرګند ډول ورکړئ، یا هغه څه وغواړئ چې د جزیاتو ځانګړي فیلډ ته اړتیا لري — `category` (کټګوري)، `sort=installs` (نصبونه)، `sort=updated` (د تازه کولو نېټه)۔ په دغو قضیو کې API د جزیاتو پاڼې راوړي او په ځواب کې بېرته راغلی `details` `"full"` وي۔
 
 ## تېروتنې
 

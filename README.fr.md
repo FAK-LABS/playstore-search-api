@@ -40,13 +40,13 @@ data.results.forEach(a => console.log(a.name, a.package, a.score, a.installs));
 | Paramètre | Valeurs | Défaut | Notes |
 |---|---|---|---|
 | `q` | texte de recherche (200 caractères max) | — | **Obligatoire.** |
-| `category` | id de genre du Play Store, ex. `communication`, `game_arcade`, `education`, `tools`, `photography`, `game_puzzle` | — | Nécessite `details=full` (le défaut). Insensible à la casse ; le nom affiché fonctionne aussi (`Communication`). |
-| `price` | `free`, `paid`, `all` | `all` | |
-| `sort` | `relevance`, `rating`, `installs`, `updated` | `relevance` | `updated` nécessite `details=full` (le défaut). |
+| `category` | id de genre du Play Store, ex. `communication`, `game_arcade`, `education`, `tools`, `photography`, `game_puzzle` | — | Implique `details=full` (récupère les pages de détails). Insensible à la casse ; le nom affiché fonctionne aussi (`Communication`). |
+| `price` | `free`, `paid`, `all` | `all` | Filtré par Play lui-même, sans appels supplémentaires. |
+| `sort` | `relevance`, `rating`, `installs`, `updated` | `relevance` | `installs` et `updated` impliquent `details=full`. `rating` trie sur la note en étoiles imprimée sur chaque carte. |
 | `hl` | code de langue, ex. `en`, `ur`, `es` | `en` | Langue d'interface des résultats. |
 | `gl` | code de région, ex. `US`, `PK`, `ES` | `US` | Région pour laquelle les résultats sont localisés. |
 | `maxResults` | 1–30 | `20` | La page de recherche Play liste au maximum ~30 apps par requête, donc les résultats sont plafonnés à 30. |
-| `details` | `full`, `basic` | `full` | `full` récupère la page de détails de chaque app (données complètes). `basic` est plus rapide mais plus léger — voir ci-dessous. |
+| `details` | `full`, `basic` | `basic` | `basic` (le défaut) ne lit qu'une page de recherche — 1 appel. `full` récupère la page de détails de chaque app (données complètes). |
 
 Les filtres se combinent librement — tous les paramètres fonctionnent ensemble :
 
@@ -91,7 +91,7 @@ Champs de premier niveau :
 
 ### Exemple de réponse
 
-`GET https://play-api.faizankhichi.me/?q=whatsapp&maxResults=1`
+`GET https://play-api.faizankhichi.me/?q=whatsapp&maxResults=1&details=full`
 
 ```json
 {
@@ -270,7 +270,7 @@ Il n'y a pas de token de page. La recherche web de Play n'a pas de pagination st
 
 ## details=basic
 
-`details=basic` saute la récupération de la page de détails de chaque app, donc c'est plus rapide — mais plus léger. La page de recherche ne rend les métadonnées complètes (notes, installations, prix, résumé, badges) que pour le **premier** résultat ; les résultats 2+ sont des lignes compactes avec seulement le nom, le développeur, la note en étoiles et l'icône. En mode basic, ces champs reviennent `null` plutôt que devinés. Utilisez `details=full` (le défaut) quand vous avez besoin de données complètes.
+`details=basic` est le défaut : un seul appel — la page de recherche uniquement, rien d'autre. C'est plus léger par design. La page de recherche ne rend les métadonnées complètes (notes, installations, prix, résumé, badges) que pour le **premier** résultat ; les résultats 2+ sont des lignes compactes avec seulement le nom, le développeur, la note en étoiles et l'icône. En mode basic, ces champs reviennent `null` plutôt que devinés. Chaque ligne porte quand même sa note en étoiles, donc `sort=rating` fonctionne en mode basic, et `price` est filtré par Play lui-même, sans appels supplémentaires. Les pages de détails ne sont récupérées que dans un but précis : passez `details=full` explicitement, ou demandez quelque chose qui a besoin d'un champ de détails — `category` (genre), `sort=installs` (installations), `sort=updated` (date de mise à jour). Dans ces cas, l'API récupère les pages de détails et le `details` renvoyé dans la réponse est `"full"`.
 
 ## Erreurs
 

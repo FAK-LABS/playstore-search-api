@@ -40,13 +40,13 @@ data.results.forEach(a => console.log(a.name, a.package, a.score, a.installs));
 | Parámetro | Valores | Predeterminado | Notas |
 |---|---|---|---|
 | `q` | texto de búsqueda (máx. 200 caracteres) | — | **Obligatorio.** |
-| `category` | id de género de Play Store, ej. `communication`, `game_arcade`, `education`, `tools`, `photography`, `game_puzzle` | — | Necesita `details=full` (el predeterminado). No distingue mayúsculas; el nombre visible también funciona (`Communication`). |
-| `price` | `free`, `paid`, `all` | `all` | |
-| `sort` | `relevance`, `rating`, `installs`, `updated` | `relevance` | `updated` necesita `details=full` (el predeterminado). |
+| `category` | id de género de Play Store, ej. `communication`, `game_arcade`, `education`, `tools`, `photography`, `game_puzzle` | — | Implica `details=full` (obtiene las páginas de detalles). No distingue mayúsculas; el nombre visible también funciona (`Communication`). |
+| `price` | `free`, `paid`, `all` | `all` | Filtrado por la propia Play, sin llamadas adicionales. |
+| `sort` | `relevance`, `rating`, `installs`, `updated` | `relevance` | `installs` y `updated` implican `details=full`. `rating` ordena por la valoración en estrellas impresa en cada tarjeta. |
 | `hl` | código de idioma, ej. `en`, `ur`, `es` | `en` | Idioma de la interfaz de los resultados. |
 | `gl` | código de región, ej. `US`, `PK`, `ES` | `US` | Región para la que se localizan los resultados. |
 | `maxResults` | 1–30 | `20` | La página de búsqueda de Play muestra como máximo ~30 apps por consulta, así que los resultados se limitan a 30. |
-| `details` | `full`, `basic` | `full` | `full` obtiene la página de detalles de cada app (datos completos). `basic` es más rápido pero más simple — ver abajo. |
+| `details` | `full`, `basic` | `basic` | `basic` (el predeterminado) lee una sola página de búsqueda — 1 llamada. `full` obtiene la página de detalles de cada app (datos completos). |
 
 Los filtros se combinan libremente — todos los parámetros funcionan juntos:
 
@@ -91,7 +91,7 @@ Campos de nivel superior:
 
 ### Ejemplo de respuesta
 
-`GET https://play-api.faizankhichi.me/?q=whatsapp&maxResults=1`
+`GET https://play-api.faizankhichi.me/?q=whatsapp&maxResults=1&details=full`
 
 ```json
 {
@@ -270,7 +270,7 @@ No hay token de página. La búsqueda web de Play no tiene paginación estable �
 
 ## details=basic
 
-`details=basic` omite la obtención de la página de detalles de cada app, así que es más rápido — pero más simple. La página de búsqueda solo muestra los metadatos completos (valoraciones, instalaciones, precio, resumen, insignias) para el **primer** resultado; los resultados 2+ son filas compactas con solo nombre, desarrollador, valoración en estrellas e icono. En modo basic, esos campos devuelven `null` en lugar de adivinados. Usa `details=full` (el predeterminado) cuando necesites datos completos.
+`details=basic` es el predeterminado: una sola llamada — solo la página de búsqueda, nada más. Es más simple por diseño. La página de búsqueda solo muestra los metadatos completos (valoraciones, instalaciones, precio, resumen, insignias) para el **primer** resultado; los resultados 2+ son filas compactas con solo nombre, desarrollador, valoración en estrellas e icono. En modo basic, esos campos devuelven `null` en lugar de adivinados. Cada fila sigue trayendo su valoración en estrellas, así que `sort=rating` funciona en modo basic, y `price` lo filtra la propia Play, sin llamadas adicionales. Las páginas de detalles solo se obtienen con un propósito: pasa `details=full` explícitamente, o pide algo que necesite un campo solo de detalles — `category` (género), `sort=installs` (instalaciones), `sort=updated` (fecha de actualización). En esos casos la API obtiene las páginas de detalles y el `details` devuelto en la respuesta es `"full"`.
 
 ## Errores
 
